@@ -33,7 +33,8 @@
 
 // This isn't being used anymore in StartVoiceCapture()
 //
- //#ifndef DEFAULT_DEVICE_NAME
+//#ifndef DEFAULT_DEVICE_NAME
+
 //#define DEFAULT_DEVICE_NAME TEXT("Default Device")
 //#endif
 
