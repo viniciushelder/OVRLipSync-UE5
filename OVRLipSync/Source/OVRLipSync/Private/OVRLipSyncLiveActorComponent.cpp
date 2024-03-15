@@ -26,17 +26,16 @@
 #include "AndroidPermissionCallbackProxy.h"
 #include "AndroidPermissionFunctionLibrary.h"
 #include "OVRLipSyncContextWrapper.h"
-#include "Voice/Public/VoiceModule.h"
+#include "VoiceModule.h"
 
 #include <Core.h>
 #include <algorithm>
 
 // This isn't being used anymore in StartVoiceCapture()
 //
-//#ifndef DEFAULT_DEVICE_NAME
 
-//#define DEFAULT_DEVICE_NAME TEXT("Default Device")
-//#endif
+#define DEFAULT_DEVICE_NAME TEXT("")
+
 
 // Convert OVRLipSyncProviderKind enum to OVRLipSync
 ovrLipSyncContextProvider ContextProviderFromProviderKind(OVRLipSyncProviderKind Kind)
@@ -122,7 +121,7 @@ void UOVRLipSyncActorComponent::PermissionCallback(const TArray<FString> &Permis
 
 void UOVRLipSyncActorComponent::StartVoiceCapture()
 {
-	VoiceCapture = FVoiceModule::Get().CreateVoiceCapture("", SampleRate, 1);
+	VoiceCapture = FVoiceModule::Get().CreateVoiceCapture(DefaultDeviceName, SampleRate, 1);
 	if (!VoiceCapture)
 	{
 		UE_LOG(LogOvrLipSync, Error, TEXT("Can't create voice capture."));

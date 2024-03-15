@@ -43,16 +43,19 @@ class OVRLIPSYNC_API UOVRLipSyncActorComponent : public UOVRLipSyncActorComponen
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "LipSync")
+	FString DefaultDeviceName = "";
+
+	UPROPERTY(EditAnywhere, Category = "LipSync")
 	int32 SampleRate = 48000;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "LipSync")
 	int32 BufferSize = 4096;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "LipSync")
 	OVRLipSyncProviderKind ProviderKind = OVRLipSyncProviderKind::EnhancedWithLaughter;
 
-	UPROPERTY(EditAnywhere, Meta = (ToolTip = "Enable hardware acceleration on supported platforms"))
+	UPROPERTY(EditAnywhere, Meta = (ToolTip = "Enable hardware acceleration on supported platforms"), Category = "LipSync")
 	bool EnableHardwareAcceleration = true;
 
 	UFUNCTION(BlueprintCallable, Category = "LipSync")

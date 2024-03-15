@@ -35,14 +35,13 @@ class OVRLIPSYNC_API UOVRLipSyncPlaybackActorComponent : public UOVRLipSyncActor
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Meta = (Tooltip = "LipSync Sequence to be played"))
+	UPROPERTY(EditAnywhere, Category = "LipSync", Meta = (Tooltip = "LipSync Sequence to be played"))
 	UOVRLipSyncFrameSequence *Sequence;
 
-	UPROPERTY(BlueprintReadonly)
+	UPROPERTY(BlueprintReadonly, Category = "LipSync")
 	UAudioComponent *AudioComponent;
 
-	UFUNCTION(BlueprintCallable, Category = "LipSync",
-			  Meta = (Tooltip = "Start playback of the canned sequence synchronized with AudioComponent"))
+	UFUNCTION(BlueprintCallable, Category = "LipSync", Meta = (Tooltip = "Start playback of the canned sequence synchronized with AudioComponent"))
 	void Start(UAudioComponent *InAudioComponent, UOVRLipSyncFrameSequence *InSequence);
 
 	UFUNCTION(BlueprintCallable, Category = "LipSync")

@@ -37,7 +37,7 @@ public class OVRLipSync : ModuleRules
         string LibraryDirectory = Path.Combine(ThirdPartyDirectory, "Lib", PlatformString);
         string TargetBinariesDirectory = Path.Combine(BaseDirectory, "Binaries", PlatformString);
         PublicIncludePaths.Add(Path.Combine(ThirdPartyDirectory, "Include"));
-        PublicDependencyModuleNames.AddRange( new string[] { "Core", "CoreUObject", "Engine", "Voice"});
+        PublicDependencyModuleNames.AddRange( new string[] { "Core", "CoreUObject", "Engine", "Voice", "AndroidPermission"});
 
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
