@@ -27,6 +27,7 @@
 #include "AndroidPermissionFunctionLibrary.h"
 #include "OVRLipSyncContextWrapper.h"
 #include "VoiceModule.h"
+#include "TimerManager.h"
 
 #include <Core.h>
 #include <algorithm>
@@ -152,6 +153,8 @@ void UOVRLipSyncActorComponent::FeedAudio(const TArray<uint8> &VoiceData)
 
 void UOVRLipSyncActorComponent::Stop()
 {
+	InitNeutralPose();
+	
 	if (!VoiceCapture)
 	{
 		return;
@@ -162,7 +165,6 @@ void UOVRLipSyncActorComponent::Stop()
 	VoiceCapture->Stop();
 	VoiceCapture = nullptr;
 
-	InitNeutralPose();
 }
 
 // Called every VoiceCaptureTimerRate seconds (10ms) to process audio data
