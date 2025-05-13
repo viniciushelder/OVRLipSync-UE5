@@ -1,8 +1,0 @@
-{
-	"BuildId": "37670630",
-	"Modules": 
-	{
-		"OVRLipSync": "UnrealEditor-OVRLipSync.dll",
-		"OVRLipSyncEditor": "UnrealEditor-OVRLipSyncEditor.dll"
-	}
-}
