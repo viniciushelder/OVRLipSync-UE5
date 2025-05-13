@@ -8,7 +8,13 @@ As you might know, the plugin available from the link in the offical docs don't 
 
 1. Copy the <mark>OVRLipSync</mark> folder in this repository to the Plugins folder in your Unreal Engine 5 project. From the **Edit** menu, select **Plugins** and then **Audio**. You should see the **Oculus Lipsync** plugin as one of the options. Select Enabled to enable the plugin for your project.
 
-2. Check the official [Docs](https://developer.oculus.com/documentation/unreal/audio-ovrlipsync-unreal/)
+2. Add the following to your **DefaultEngine.ini**:
+```ini
+[Voice]
+bEnabled=true
+``` 
+
+3. Check the official [Docs](https://developer.oculus.com/documentation/unreal/audio-ovrlipsync-unreal/)
 
 
 ## License

@@ -86,7 +86,7 @@ void UOVRLipSyncActorComponent::Start()
 	FString AudioPermission = TEXT("android.permission.RECORD_AUDIO");
 	if (!UAndroidPermissionFunctionLibrary::CheckPermission(AudioPermission))
 	{
-		UE_LOG(LogOvrLipSync, Log, TEXT("Asking for record audio permission..."));
+		UE_LOG(LogTemp, Log, TEXT("Asking for record audio permission..."));
 		TArray<FString> PermissionsToCheck;
 		PermissionsToCheck.Add(AudioPermission);
 		UAndroidPermissionCallbackProxy *PermCallback =
@@ -107,30 +107,30 @@ void UOVRLipSyncActorComponent::Start()
 
 void UOVRLipSyncActorComponent::PermissionCallback(const TArray<FString> &Permissions, const TArray<bool> &GrantResults)
 {
-	UE_LOG(LogOvrLipSync, Log, TEXT("Finished asking for audio permissions."));
+	UE_LOG(LogTemp, Log, TEXT("Finished asking for audio permissions."));
 
 	if (GrantResults.Num() > 0 && GrantResults[0])
 	{
-		UE_LOG(LogOvrLipSync, Log, TEXT("Audio permissions granted."));
+		UE_LOG(LogTemp, Log, TEXT("Audio permissions granted."));
 		StartVoiceCapture();
 	}
 	else
 	{
-		UE_LOG(LogOvrLipSync, Error, TEXT("Audio permissions DENIED!"));
+		UE_LOG(LogTemp, Error, TEXT("Audio permissions DENIED!"));
 	}
 }
 
 void UOVRLipSyncActorComponent::StartVoiceCapture()
 {
-	VoiceCapture = FVoiceModule::Get().CreateVoiceCapture(DefaultDeviceName, SampleRate, 1);
+	VoiceCapture = FVoiceModule::Get().CreateVoiceCapture("", SampleRate, 1);
 	if (!VoiceCapture)
 	{
-		UE_LOG(LogOvrLipSync, Error, TEXT("Can't create voice capture."));
+		UE_LOG(LogTemp, Error, TEXT("Can't create voice capture."));
 		return;
 	}
 	else
 	{
-		UE_LOG(LogOvrLipSync, Log, TEXT("Created voice capture."));
+		UE_LOG(LogTemp, Log, TEXT("Created voice capture."));
 	}
 
 	VoiceCapture->Start();
@@ -185,15 +185,15 @@ void UOVRLipSyncActorComponent::OnVoiceCaptureTimer()
 	{
 		if (!VoiceCapture->Init("", SampleRate, 1) || !VoiceCapture->Start())
 		{
-			UE_LOG(LogOvrLipSync, Log, TEXT("Unsuccessfully tried to restart VoiceCapture."));
+			UE_LOG(LogTemp, Log, TEXT("Unsuccessfully tried to restart VoiceCapture."));
 			return;
-		}
-		UE_LOG(LogOvrLipSync, Log, TEXT("Restarted VoiceCapture."));
+		} 
+		UE_LOG(LogTemp, Log, TEXT("Restarted VoiceCapture."));
 		return;
 	}
 	if (CaptureState != EVoiceCaptureState::Ok)
 	{
-		UE_LOG(LogOvrLipSync, Error, TEXT("Invalid capture state: %s"), EVoiceCaptureState::ToString(CaptureState));
+		UE_LOG(LogTemp, Error, TEXT("Invalid capture state: %s"), EVoiceCaptureState::ToString(CaptureState));
 		return;
 	}
 	if (AvailableVoiceData == 0)
@@ -208,7 +208,7 @@ void UOVRLipSyncActorComponent::OnVoiceCaptureTimer()
 	CaptureState = VoiceCapture->GetVoiceData(VoiceData.GetData(), VoiceData.Num(), VoiceDataCaptured);
 	if (CaptureState != EVoiceCaptureState::Ok || VoiceDataCaptured == 0)
 	{
-		UE_LOG(LogOvrLipSync, Error, TEXT("Failed to get voice data: %s DataCaptured=%d"),
+		UE_LOG(LogTemp, Error, TEXT("Failed to get voice data: %s DataCaptured=%d"),
 			   EVoiceCaptureState::ToString(CaptureState), VoiceDataCaptured);
 		return;
 	}

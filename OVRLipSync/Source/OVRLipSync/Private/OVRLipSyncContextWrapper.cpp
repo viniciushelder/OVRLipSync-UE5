@@ -34,6 +34,7 @@ UOVRLipSyncContextWrapper::UOVRLipSyncContextWrapper(ovrLipSyncContextProvider P
 	auto pluginsDir = FPaths::ProjectPluginsDir();
 	auto libDir = FPaths::Combine(pluginsDir, TEXT("OVRLipSync"), TEXT("ThirdParty"), TEXT("Lib"),
 								  FPlatformProcess::GetBinariesSubdirectory());
+
 	TArray<char> libDirChar(libDir.GetCharArray());
 	auto rc = ovrLipSync_InitializeEx(SampleRate, BufferSize, libDirChar.GetData());
 #else

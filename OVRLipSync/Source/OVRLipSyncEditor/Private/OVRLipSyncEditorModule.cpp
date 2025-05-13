@@ -46,31 +46,26 @@ constexpr auto LipSyncSequenceDuration = 1.0f / LipSyncSequenceUpateFrequency;
 // Decompresses SoundWave object by initializing RawPCM data
 bool DecompressSoundWave(USoundWave *SoundWave)
 {
-	if (SoundWave->RawPCMData)
+	if (!SoundWave)
 	{
-		return true;
+		return false; //Checks if the SoundWave obj is valid
 	}
+
+	if (SoundWave->GetResourceSize()>0)
+	{
+		return true; //If its already initialized, just return true
+	}
+
 	auto AudioDevice = GEngine->GetMainAudioDevice();
+	
 	if (!AudioDevice)
 	{
 		return false;
 	}
 
-	AudioDevice->StopAllSounds(true);
-	auto OriginalDecompressionType = SoundWave->DecompressionType;
-	SoundWave->DecompressionType = DTYPE_Native;
-	if (SoundWave->InitAudioResource(AudioDevice->GetRuntimeFormat(SoundWave)))
-	{
-#if UE_VERSION_OLDER_THAN(4, 22, 0)
-		USoundWave::FAsyncAudioDecompress Decompress(SoundWave);
-#else
-		USoundWave::FAsyncAudioDecompress Decompress(SoundWave, MONO_PCM_BUFFER_SAMPLES);
-#endif
-		Decompress.StartSynchronousTask();
-	}
-	SoundWave->DecompressionType = OriginalDecompressionType;
+	FName RuntimeFormat = SoundWave->GetRuntimeFormat();
 
-	return true;
+	return SoundWave->InitAudioResource((RuntimeFormat));
 }
 
 bool OVRLipSyncProcessSoundWave(const FAssetData &SoundWaveAsset, bool UseOfflineModel = false)
