@@ -29,5 +29,11 @@
         "Mac"
       ]
     }
+  ],
+   "Plugins": [
+    {
+      "Name": "AndroidPermission",
+      "Enabled": true
+    }
   ]
 }

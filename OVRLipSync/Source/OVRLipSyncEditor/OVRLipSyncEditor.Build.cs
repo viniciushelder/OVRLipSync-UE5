@@ -29,7 +29,7 @@ public class OVRLipSyncEditor : ModuleRules
     public OVRLipSyncEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
+        PrivateDependencyModuleNames.AddRange(new string[] {"AndroidPermission"});
         PublicDependencyModuleNames.AddRange( new string[] {
           "Core",
           "CoreUObject",
@@ -37,6 +37,7 @@ public class OVRLipSyncEditor : ModuleRules
           "OVRLipSync",
           "Slate",
           "SlateCore",
+          "AndroidPermission",
           "Voice"
         });
     }
