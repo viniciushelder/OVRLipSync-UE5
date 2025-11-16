@@ -193,12 +193,12 @@ bool UOVRLipSyncDecode::Base64ToSoundWave(const FString& Base64WavData, USoundWa
 	// Set SoundWave properties
 	OutSoundWave->SetSampleRate(SampleRate);
 	OutSoundWave->NumChannels = NumChannels;
-	OutSoundWave->Duration = (float)PCMDataSize / (SampleRate * NumChannels * sizeof(int16));
+	OutSoundWave->Duration = static_cast<float>(PCMDataSize) / static_cast<float>(SampleRate * NumChannels * sizeof(int16));
 	OutSoundWave->RawPCMDataSize = PCMDataSize;
 
 	// Allocate and copy PCM data
-	OutSoundWave->RawPCMData = static_cast<uint8*>(FMemory::Malloc(PCMDataSize));
-	FMemory::Memcpy(OutSoundWave->RawPCMData, WavData.GetData() + PCMDataOffset, PCMDataSize);
+	OutSoundWave->RawPCMData = static_cast<uint8*>(FMemory::Malloc(static_cast<SIZE_T>(PCMDataSize)));
+	FMemory::Memcpy(OutSoundWave->RawPCMData, WavData.GetData() + PCMDataOffset, static_cast<SIZE_T>(PCMDataSize));
 
 	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[Base64ToSoundWave] SoundWave created successfully - Duration: %.2f seconds"), OutSoundWave->Duration);
 
@@ -237,7 +237,7 @@ bool UOVRLipSyncDecode::GenerateLipSyncSequenceRuntime(USoundWave* SoundWave, bo
 	// Validate channel count
 	if (SoundWave->NumChannels > 2)
 	{
-		UE_LOG(LogOVRLipSyncDecode, Error, TEXT("[GenerateLipSyncSequenceRuntime] Only mono and stereo streams are supported, got %d channels"), SoundWave->NumChannels);
+		UE_LOG(LogOVRLipSyncDecode, Error, TEXT("[GenerateLipSyncSequenceRuntime] Only mono and stereo streams are supported, got %d channels"), static_cast<int32>(SoundWave->NumChannels));
 		return false;
 	}
 
@@ -256,7 +256,7 @@ bool UOVRLipSyncDecode::GenerateLipSyncSequenceRuntime(USoundWave* SoundWave, bo
 	}
 
 	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[GenerateLipSyncSequenceRuntime] SoundWave validated - Channels: %d, Sample Rate: %d, PCM Size: %u"),
-		SoundWave->NumChannels, SoundWave->GetSampleRateForCurrentPlatform(), SoundWave->RawPCMDataSize);
+		static_cast<int32>(SoundWave->NumChannels), static_cast<int32>(SoundWave->GetSampleRateForCurrentPlatform()), SoundWave->RawPCMDataSize);
 
 	// Create LipSync sequence
 	OutSequence = NewObject<UOVRLipSyncFrameSequence>();
