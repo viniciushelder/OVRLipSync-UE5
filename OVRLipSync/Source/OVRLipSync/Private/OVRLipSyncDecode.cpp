@@ -63,7 +63,7 @@ bool UOVRLipSyncDecode::ParseWavHeader(const TArray<uint8>& WavData, uint32& Out
 	const int32 MinWavSize = static_cast<int32>(sizeof(FWavHeader) + sizeof(FWavDataHeader));
 	if (WavData.Num() < MinWavSize)
 	{
-		UE_LOG(LogOVRLipSyncDecode, Error, TEXT("[ParseWavHeader] WAV data too small: %d bytes"), WavData.Num());
+		UE_LOG(LogOVRLipSyncDecode, Error, TEXT("[ParseWavHeader] WAV data too small: %d bytes"), static_cast<int32>(WavData.Num()));
 		return false;
 	}
 
@@ -151,7 +151,7 @@ bool UOVRLipSyncDecode::ParseWavHeader(const TArray<uint8>& WavData, uint32& Out
 
 bool UOVRLipSyncDecode::Base64ToSoundWave(const FString& Base64WavData, USoundWave*& OutSoundWave)
 {
-	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[Base64ToSoundWave] Starting conversion, Base64 string length: %d"), Base64WavData.Len());
+	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[Base64ToSoundWave] Starting conversion, Base64 string length: %d"), static_cast<int32>(Base64WavData.Len()));
 
 	// Decode Base64
 	TArray<uint8> WavData;
@@ -161,7 +161,7 @@ bool UOVRLipSyncDecode::Base64ToSoundWave(const FString& Base64WavData, USoundWa
 		return false;
 	}
 
-	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[Base64ToSoundWave] Base64 decoded successfully, WAV data size: %d bytes"), WavData.Num());
+	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[Base64ToSoundWave] Base64 decoded successfully, WAV data size: %d bytes"), static_cast<int32>(WavData.Num()));
 
 	// Parse WAV header
 	uint32 SampleRate = 0;
@@ -266,11 +266,11 @@ bool UOVRLipSyncDecode::GenerateLipSyncSequenceRuntime(USoundWave* SoundWave, bo
 		return false;
 	}
 
-	int32 NumChannels = SoundWave->NumChannels;
-	int32 SampleRate = SoundWave->GetSampleRateForCurrentPlatform();
+	int32 NumChannels = static_cast<int32>(SoundWave->NumChannels);
+	int32 SampleRate = static_cast<int32>(SoundWave->GetSampleRateForCurrentPlatform());
 	int32 PCMDataSize = static_cast<int32>(SoundWave->RawPCMDataSize / sizeof(int16));
 	int16* PCMData = reinterpret_cast<int16*>(SoundWave->RawPCMData);
-	int32 ChunkSizeSamples = static_cast<int32>(SampleRate * LipSyncSequenceDuration);
+	int32 ChunkSizeSamples = static_cast<int32>(static_cast<float>(SampleRate) * LipSyncSequenceDuration);
 	int32 ChunkSize = NumChannels * ChunkSizeSamples;
 
 	// Setup model path for offline model if requested
