@@ -60,7 +60,8 @@ namespace
 
 bool UOVRLipSyncDecode::ParseWavHeader(const TArray<uint8>& WavData, uint32& OutSampleRate, uint16& OutNumChannels, uint32& OutPCMDataOffset, uint32& OutPCMDataSize)
 {
-	if (WavData.Num() < sizeof(FWavHeader) + sizeof(FWavDataHeader))
+	const int32 MinWavSize = static_cast<int32>(sizeof(FWavHeader) + sizeof(FWavDataHeader));
+	if (WavData.Num() < MinWavSize)
 	{
 		UE_LOG(LogOVRLipSyncDecode, Error, TEXT("[ParseWavHeader] WAV data too small: %d bytes"), WavData.Num());
 		return false;
@@ -93,28 +94,28 @@ bool UOVRLipSyncDecode::ParseWavHeader(const TArray<uint8>& WavData, uint32& Out
 	// Validate PCM format
 	if (Header->AudioFormat != 1)
 	{
-		UE_LOG(LogOVRLipSyncDecode, Error, TEXT("[ParseWavHeader] Unsupported audio format: %d (only PCM is supported)"), Header->AudioFormat);
+		UE_LOG(LogOVRLipSyncDecode, Error, TEXT("[ParseWavHeader] Unsupported audio format: %u (only PCM is supported)"), Header->AudioFormat);
 		return false;
 	}
 
 	// Validate bits per sample
 	if (Header->BitsPerSample != 16)
 	{
-		UE_LOG(LogOVRLipSyncDecode, Error, TEXT("[ParseWavHeader] Unsupported bits per sample: %d (only 16-bit is supported)"), Header->BitsPerSample);
+		UE_LOG(LogOVRLipSyncDecode, Error, TEXT("[ParseWavHeader] Unsupported bits per sample: %u (only 16-bit is supported)"), Header->BitsPerSample);
 		return false;
 	}
 
 	// Find data chunk
-	uint32 Offset = sizeof(FWavHeader);
+	uint32 Offset = static_cast<uint32>(sizeof(FWavHeader));
 	bool bFoundDataChunk = false;
 
-	while (Offset + sizeof(FWavDataHeader) <= WavData.Num())
+	while (Offset + static_cast<uint32>(sizeof(FWavDataHeader)) <= static_cast<uint32>(WavData.Num()))
 	{
 		const FWavDataHeader* DataHeader = reinterpret_cast<const FWavDataHeader*>(WavData.GetData() + Offset);
 
 		if (FMemory::Memcmp(DataHeader->data, "data", 4) == 0)
 		{
-			OutPCMDataOffset = Offset + sizeof(FWavDataHeader);
+			OutPCMDataOffset = Offset + static_cast<uint32>(sizeof(FWavDataHeader));
 			OutPCMDataSize = DataHeader->DataSize;
 			bFoundDataChunk = true;
 			break;
@@ -122,7 +123,7 @@ bool UOVRLipSyncDecode::ParseWavHeader(const TArray<uint8>& WavData, uint32& Out
 
 		// Skip this chunk and move to next
 		Offset += 8; // chunk ID (4) + chunk size field (4)
-		if (Offset + 4 <= WavData.Num())
+		if (Offset + 4 <= static_cast<uint32>(WavData.Num()))
 		{
 			uint32 ChunkSize = *reinterpret_cast<const uint32*>(WavData.GetData() + Offset - 4);
 			Offset += ChunkSize;
@@ -142,7 +143,7 @@ bool UOVRLipSyncDecode::ParseWavHeader(const TArray<uint8>& WavData, uint32& Out
 	OutSampleRate = Header->SampleRate;
 	OutNumChannels = Header->NumChannels;
 
-	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[ParseWavHeader] Success - Sample Rate: %d, Channels: %d, PCM Data Size: %d bytes"),
+	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[ParseWavHeader] Success - Sample Rate: %u, Channels: %u, PCM Data Size: %u bytes"),
 		OutSampleRate, OutNumChannels, OutPCMDataSize);
 
 	return true;
@@ -254,7 +255,7 @@ bool UOVRLipSyncDecode::GenerateLipSyncSequenceRuntime(USoundWave* SoundWave, bo
 		return false;
 	}
 
-	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[GenerateLipSyncSequenceRuntime] SoundWave validated - Channels: %d, Sample Rate: %d, PCM Size: %d"),
+	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[GenerateLipSyncSequenceRuntime] SoundWave validated - Channels: %d, Sample Rate: %d, PCM Size: %u"),
 		SoundWave->NumChannels, SoundWave->GetSampleRateForCurrentPlatform(), SoundWave->RawPCMDataSize);
 
 	// Create LipSync sequence
@@ -265,12 +266,12 @@ bool UOVRLipSyncDecode::GenerateLipSyncSequenceRuntime(USoundWave* SoundWave, bo
 		return false;
 	}
 
-	auto NumChannels = SoundWave->NumChannels;
-	auto SampleRate = SoundWave->GetSampleRateForCurrentPlatform();
-	auto PCMDataSize = SoundWave->RawPCMDataSize / sizeof(int16);
-	auto PCMData = reinterpret_cast<int16*>(SoundWave->RawPCMData);
-	auto ChunkSizeSamples = static_cast<int>(SampleRate * LipSyncSequenceDuration);
-	auto ChunkSize = NumChannels * ChunkSizeSamples;
+	int32 NumChannels = SoundWave->NumChannels;
+	int32 SampleRate = SoundWave->GetSampleRateForCurrentPlatform();
+	int32 PCMDataSize = static_cast<int32>(SoundWave->RawPCMDataSize / sizeof(int16));
+	int16* PCMData = reinterpret_cast<int16*>(SoundWave->RawPCMData);
+	int32 ChunkSizeSamples = static_cast<int32>(SampleRate * LipSyncSequenceDuration);
+	int32 ChunkSize = NumChannels * ChunkSizeSamples;
 
 	// Setup model path for offline model if requested
 	FString ModelPath;
@@ -300,15 +301,15 @@ bool UOVRLipSyncDecode::GenerateLipSyncSequenceRuntime(USoundWave* SoundWave, bo
 	Samples.SetNumZeroed(ChunkSize);
 	Context.ProcessFrame(Samples.GetData(), ChunkSizeSamples, Visemes, LaughterScore, FrameDelayInMs, NumChannels > 1);
 
-	int FrameOffset = static_cast<int>(FrameDelayInMs * SampleRate / 1000 * NumChannels);
+	int32 FrameOffset = static_cast<int32>(FrameDelayInMs * SampleRate / 1000 * NumChannels);
 
 	UE_LOG(LogOVRLipSyncDecode, Log, TEXT("[GenerateLipSyncSequenceRuntime] Processing frames - Total samples: %d, Frame offset: %d, Chunk size: %d"),
 		PCMDataSize, FrameOffset, ChunkSize);
 
-	int FrameCount = 0;
-	for (int Offs = 0; Offs < PCMDataSize + FrameOffset; Offs += ChunkSize)
+	int32 FrameCount = 0;
+	for (int32 Offs = 0; Offs < PCMDataSize + FrameOffset; Offs += ChunkSize)
 	{
-		int RemainingSamples = PCMDataSize - Offs;
+		int32 RemainingSamples = PCMDataSize - Offs;
 		if (RemainingSamples >= ChunkSize)
 		{
 			Context.ProcessFrame(PCMData + Offs, ChunkSizeSamples, Visemes, LaughterScore, FrameDelayInMs, NumChannels > 1);
@@ -317,12 +318,12 @@ bool UOVRLipSyncDecode::GenerateLipSyncSequenceRuntime(USoundWave* SoundWave, bo
 		{
 			if (RemainingSamples > 0)
 			{
-				FMemory::Memcpy(Samples.GetData(), PCMData + Offs, sizeof(int16) * RemainingSamples);
-				FMemory::Memset(Samples.GetData() + RemainingSamples, 0, sizeof(int16) * (ChunkSize - RemainingSamples));
+				FMemory::Memcpy(Samples.GetData(), PCMData + Offs, static_cast<SIZE_T>(sizeof(int16)) * RemainingSamples);
+				FMemory::Memset(Samples.GetData() + RemainingSamples, 0, static_cast<SIZE_T>(sizeof(int16)) * (ChunkSize - RemainingSamples));
 			}
 			else
 			{
-				FMemory::Memset(Samples.GetData(), 0, sizeof(int16) * ChunkSize);
+				FMemory::Memset(Samples.GetData(), 0, static_cast<SIZE_T>(sizeof(int16)) * ChunkSize);
 			}
 			Context.ProcessFrame(Samples.GetData(), ChunkSizeSamples, Visemes, LaughterScore, FrameDelayInMs, NumChannels > 1);
 		}
