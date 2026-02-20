@@ -48,7 +48,14 @@ void UOVRLipSyncActorComponentBase::AssignVisemesToMorphTargets(USkeletalMeshCom
 		UE_LOG(LogOvrLipSync, Error, TEXT("Mesh is NULL"));
 		return;
 	}
-	for (int cnt = 0; cnt < MorphTargetNames.Num(); cnt++)
+	const int32 MorphTargetsToApply = FMath::Min(MorphTargetNames.Num(), Visemes.Num());
+	if (MorphTargetNames.Num() != Visemes.Num())
+	{
+		UE_LOG(LogOvrLipSync, Warning,
+			   TEXT("Morph target count (%d) does not match viseme count (%d); applying %d entries."),
+			   MorphTargetNames.Num(), Visemes.Num(), MorphTargetsToApply);
+	}
+	for (int32 cnt = 0; cnt < MorphTargetsToApply; ++cnt)
 	{
 		Mesh->SetMorphTarget(FName(*MorphTargetNames[cnt]), Visemes[cnt]);
 	}

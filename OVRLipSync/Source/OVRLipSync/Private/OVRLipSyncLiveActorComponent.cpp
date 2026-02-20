@@ -32,12 +32,6 @@
 #include <Core.h>
 #include <algorithm>
 
-// This isn't being used anymore in StartVoiceCapture()
-//
-
-#define DEFAULT_DEVICE_NAME TEXT("")
-
-
 // Convert OVRLipSyncProviderKind enum to OVRLipSync
 ovrLipSyncContextProvider ContextProviderFromProviderKind(OVRLipSyncProviderKind Kind)
 {
